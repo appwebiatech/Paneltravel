@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="id" style="scroll-behavior: smooth;">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="description" content="AppWebiatech - Solusi digital untuk aplikasi Android dan Website.">
+    
+    <meta property="og:title" content="AppWebiatech - Solusi Digital">
+    <meta property="og:description" content="Download aplikasi ZikirNur, KasirPro, dan solusi digital lainnya.">
+    <meta property="og:image" content="appwebiatecth.jpg"> <meta property="og:type" content="website">
+
+    <title>AppWebiatech</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --lime: #a4d639;
+            --cyan: #00b4d8;
+            --navy-dark: #051626;
+            --navy-light: #0a2540;
+            --orange: #ff7b00;
+            --gold: #ffd700;
+            --red-error: #ff4d4d;
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --overlay-bg: rgba(5, 22, 38, 0.98);
+        }
+
+        /* --- FITUR ANTI SELECT --- */
+        * {
+            margin: 0; padding: 0; box-sizing: border-box;
+            font-family: 'Outfit', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+            -webkit-user-select: none; -ms-user-select: none; user-select: none;
+        }
+
+        input, textarea { user-select: text !important; -webkit-user-select: text !important; }
+
+        html, body { width: 100%; overflow-x: hidden; background: var(--navy-dark); }
+        body {
+            background: linear-gradient(135deg, var(--navy-dark), var(--navy-light));
+            background-attachment: fixed;
+            color: white; min-height: 100vh;
+        }
+
+        /* --- ORBS --- */
+        .orb {
+            position: absolute; border-radius: 50%; filter: blur(80px);
+            z-index: -1; opacity: 0.3; will-change: transform;
+            animation: float 15s infinite ease-in-out;
+        }
+        .orb-1 { width: 300px; height: 300px; background: var(--lime); top: -50px; left: -50px; }
+        .orb-2 { width: 400px; height: 400px; background: var(--cyan); bottom: -100px; right: -100px; animation-delay: 2s;}
+        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-30px); } }
+
+        /* --- NAVBAR --- */
+        .navbar {
+            position: fixed; top: 0; left: 0; width: 100%;
+            padding: 15px 5%;
+            display: flex; justify-content: space-between; align-items: center;
+            z-index: 1000;
+            background: rgba(5, 22, 38, 0.9);
+            border-bottom: 1px solid var(--glass-border);
+            backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+        }
+
+        .logo {
+            font-size: 1.3rem; font-weight: 700; color: white;
+            letter-spacing: 1px; display: flex; align-items: center; gap: 10px;
+            pointer-events: none;
+        }
+        .logo img { height: 35px; width: 35px; object-fit: cover; border-radius: 50%; border: 1px solid var(--lime); }
+        .logo span { color: var(--lime); }
+
+        .right-nav { display: flex; align-items: center; gap: 20px; }
+        .desktop-clock { text-align: right; display: block; }
+        .desktop-clock .time { font-size: 1.1rem; font-weight: bold; color: var(--lime); }
+        .desktop-clock .date { font-size: 0.8rem; color: #aaa; }
+
+        .burger-menu {
+            font-size: 1.5rem; cursor: pointer; color: white;
+            width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;
+            background: rgba(255,255,255,0.1); border-radius: 50%; transition: 0.3s;
+            z-index: 2002; position: relative;
+        }
+        .burger-menu:hover { background: rgba(255,255,255,0.2); transform: scale(1.1); }
+
+        /* --- MENU OVERLAY --- */
+        .nav-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100vh;
+            background: var(--overlay-bg);
+            z-index: 2001;
+            display: flex; flex-direction: column;
+            justify-content: center; align-items: center;
+            transform: translateX(100%); 
+            transition: transform 0.4s cubic-bezier(0.77, 0, 0.175, 1);
+            will-change: transform;
+        }
+        .nav-overlay.active { transform: translateX(0); }
+
+        .mobile-clock-container {
+            text-align: center; margin-bottom: 30px; padding: 20px;
+            border: 1px solid var(--lime); border-radius: 15px;
+            background: rgba(164, 214, 57, 0.05); display: none;
+        }
+        .mobile-clock-container .time { font-size: 2rem; font-weight: 700; color: var(--lime); }
+        .mobile-clock-container .date { font-size: 0.9rem; color: #ccc; }
+
+        .nav-links { list-style: none; text-align: center; }
+        .nav-links li { margin: 20px 0; opacity: 0; transform: translateY(20px); transition: 0.5s; }
+        .nav-overlay.active .nav-links li { opacity: 1; transform: translateY(0); }
+        
+        .nav-links a { text-decoration: none; color: white; font-size: 1.5rem; font-weight: 700; transition: 0.3s; }
+        .nav-links a:hover { color: var(--lime); letter-spacing: 2px; }
+
+        /* --- SECTIONS --- */
+        section {
+            padding: 80px 20px; min-height: 100vh; width: 100%;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+        }
+
+        #home { text-align: center; padding-top: 120px; }
+        
+        /* === EFEK LAMPU BERJALAN === */
+        .hero-text h1 {
+            font-size: clamp(2rem, 5vw, 4rem); 
+            line-height: 1.2;
+            margin-bottom: 15px;
+            font-weight: 800;
+            background: linear-gradient(90deg, #ffffff, #a4d639, #00b4d8, #ffffff);
+            background-size: 300%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: shine 4s linear infinite;
+        }
+
+        @keyframes shine {
+            0% { background-position: 0%; }
+            100% { background-position: 100%; }
+        }
+
+        .btn-action {
+            padding: 12px 35px; background: var(--lime); color: #051626;
+            font-weight: bold; border-radius: 50px; text-decoration: none;
+            display: inline-block; transition: 0.3s;
+        }
+        .btn-action:hover { transform: scale(1.05); box-shadow: 0 0 15px var(--lime); }
+
+        /* --- CARDS --- */
+        .portfolio-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px; width: 100%; max-width: 1200px; padding: 10px;
+        }
+        .card-wrap { perspective: 1000px; height: 500px; }
+        .card {
+            width: 100%; height: 100%;
+            background: rgba(5, 22, 38, 0.6);
+            border: 1px solid var(--glass-border);
+            border-top: 1px solid rgba(164, 214, 57, 0.3);
+            border-radius: 20px; padding: 25px;
+            display: flex; flex-direction: column; align-items: center; justify-content: space-between;
+            transition: transform 0.1s; transform-style: preserve-3d;
+            backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+            position: relative;
+        }
+        .card-content { transform: translateZ(50px); text-align: center; width: 100%; }
+        
+        .app-icon {
+            width: 90px; height: 90px;
+            background: linear-gradient(135deg, var(--navy-light), var(--cyan));
+            border-radius: 22px; margin: 0 auto 15px;
+            display: flex; align-items: center; justify-content: center;
+            border: 1px solid rgba(255,255,255,0.1);
+            overflow: hidden; pointer-events: none;
+        }
+        .app-icon img { width: 100%; height: 100%; object-fit: cover; }
+
+        .btn-dl {
+            display: block; width: 100%; padding: 10px; margin-bottom: 8px;
+            border-radius: 8px; text-decoration: none; font-weight: bold;
+            text-align: center; font-size: 0.9rem; transition: 0.3s;
+            cursor: pointer;
+        }
+        .btn-dl:hover { filter: brightness(1.2); transform: translateY(-2px); }
+        
+        .playstore { border: 1px solid var(--cyan); color: var(--cyan); }
+        .mediafire { border: 1px solid var(--orange); color: var(--orange); }
+
+        /* Style Premium & Promo Code */
+        .premium-btn {
+            background: linear-gradient(45deg, #FFD700, #FFA500);
+            color: #000; border: none;
+            box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3);
+        }
+        .premium-tag {
+            background: var(--gold); color: black; padding: 4px 12px;
+            border-radius: 6px; font-size: 0.75rem; font-weight: 800;
+            position: absolute; top: 20px; right: 20px;
+            transform: translateZ(60px); z-index: 10;
+            box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+        }
+        
+        /* CSS untuk area Input Kode */
+        .promo-area {
+            margin-top: 10px; padding-top: 10px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+        .promo-flex { display: flex; gap: 5px; }
+        .promo-input {
+            flex: 1; padding: 8px; border-radius: 6px;
+            border: 1px solid rgba(255,255,255,0.2);
+            background: rgba(0,0,0,0.3); color: white;
+            font-size: 0.85rem; outline: none; text-align: center;
+            transition: all 0.3s; 
+            text-transform: uppercase; /* INPUT OTOMATIS BESAR */
+        }
+        .promo-input:focus { border-color: var(--gold); }
+        .promo-btn {
+            padding: 8px 12px; background: rgba(255,255,255,0.1);
+            color: white; border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 6px; cursor: pointer; font-size: 0.85rem;
+            transition: 0.3s;
+        }
+        .promo-btn:hover { background: var(--lime); color: black; border-color: var(--lime); }
+        .hidden { display: none !important; }
+
+        /* --- ERROR MESSAGE CUSTOM --- */
+        .error-msg {
+            color: var(--red-error); font-size: 0.75rem; margin-top: 8px;
+            text-align: center; font-weight: bold; display: none;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .shake { animation: shake 0.5s; }
+        @keyframes shake {
+            0% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            50% { transform: translateX(5px); }
+            75% { transform: translateX(-5px); }
+            100% { transform: translateX(0); }
+        }
+
+        /* --- STYLE ROADMAP & ANIMASI PROGRESS BAR --- */
+        .roadmap-grid {
+            display: flex; flex-wrap: wrap; gap: 20px; width: 100%; max-width: 1000px;
+        }
+        .roadmap-card {
+            flex: 1 1 300px; background: rgba(5, 22, 38, 0.4);
+            border: 1px dashed rgba(164, 214, 57, 0.3); border-radius: 15px;
+            padding: 25px; position: relative; overflow: hidden;
+            transition: 0.3s;
+        }
+        .roadmap-card:hover { border-color: var(--lime); transform: translateY(-5px); }
+        .roadmap-badge {
+            position: absolute; top: 15px; right: 15px;
+            background: rgba(255, 255, 255, 0.1); padding: 5px 10px;
+            border-radius: 5px; font-size: 0.7rem; color: #aaa;
+        }
+        .progress-container {
+            width: 100%; background: rgba(255, 255, 255, 0.1);
+            height: 8px; border-radius: 5px; margin-top: 15px; overflow: hidden;
+        }
+        .progress-bar {
+            height: 100%; background: var(--lime);
+            border-radius: 5px; width: 0%; /* Mulai dari 0 untuk animasi */
+            box-shadow: 0 0 10px var(--lime);
+            
+            /* ANIMASI LOAD */
+            animation: loadProgress 2s ease-out forwards;
+        }
+
+        @keyframes loadProgress {
+            to { width: var(--target); }
+        }
+
+        .contact-wrapper { display: flex; flex-wrap: wrap; gap: 30px; width: 100%; max-width: 1000px; }
+        .glass-panel {
+            flex: 1 1 300px; background: rgba(5, 22, 38, 0.6);
+            border: 1px solid var(--glass-border); padding: 30px; border-radius: 20px;
+            backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+        }
+        .input-group input, .input-group textarea {
+            width: 100%; padding: 12px; background: rgba(0,0,0,0.4);
+            border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; color: white;
+            outline: none;
+        }
+        .input-group input:focus, .input-group textarea:focus { border-color: var(--lime); }
+        
+        footer { text-align: center; padding: 30px 20px; color: #666; border-top: 1px solid rgba(255,255,255,0.05); }
+
+        @media (max-width: 768px) {
+            .orb { display: none; } 
+            .navbar, .card, .glass-panel, .roadmap-card {
+                backdrop-filter: none !important; -webkit-backdrop-filter: none !important;
+                background: rgba(5, 22, 38, 0.95) !important; box-shadow: none !important;
+            }
+            .card-wrap { height: auto; margin-bottom: 20px; perspective: none; }
+            .card { height: auto; transform: none !important; padding: 30px 20px; }
+            .card-content { transform: none; }
+            .premium-tag { transform: none; }
+            .desktop-clock { display: none; }
+            .mobile-clock-container { display: block; }
+            .navbar { padding: 15px 20px; }
+            section { padding: 60px 20px; }
+        }
+    </style>
+</head>
+<body oncontextmenu="return false;">
+
+    <div class="orb orb-1"></div> 
+    <div class="orb orb-2"></div> 
+
+    <nav class="navbar">
+        <div class="logo">
+            <img src="appwebiatecth.jpg" alt="Logo">
+            App<span>Webia</span>Tech
+        </div>
+        <div class="right-nav">
+            <div class="desktop-clock">
+                <div class="time time-target">00:00:00</div>
+                <div class="date date-target">Senin, 1 Jan 2024</div>
+            </div>
+            <div class="burger-menu" onclick="toggleMenu()">
+                <i class="fas fa-bars" id="burgerIcon"></i>
+            </div>
+        </div>
+    </nav>
+
+    <div class="nav-overlay" id="navOverlay">
+        <div class="mobile-clock-container">
+            <div class="time time-target">00:00:00</div>
+            <div class="date date-target">Senin, 1 Jan</div>
+        </div>
+        <ul class="nav-links">
+            <li><a href="#home" onclick="toggleMenu()">Home</a></li>
+            <li><a href="#karya" onclick="toggleMenu()">Project Application</a></li>
+            <li><a href="#upcoming" onclick="toggleMenu()">Coming Soon</a></li>
+            <li><a href="#kontak" onclick="toggleMenu()">Contact Us</a></li>
+            <li><a href="#saran" onclick="toggleMenu()">Suggestions & Feedback</a></li>
+        </ul>
+    </div>
+
+    <section id="home">
+        <div class="hero-text">
+            <h1>SMART DIGITAL SOLUTIONS</h1>
+            <p style="color:#aaa; margin-bottom:20px;">Membangun Aplikasi & Website yang Menginspirasi.</p>
+            <a href="#karya" class="btn-action">Lihat Portfolio</a>
+        </div>
+    </section>
+
+    <section id="karya">
+        <h2 style="font-size:1.8rem; margin-bottom:40px; color:white; border-bottom:2px solid var(--lime); display:inline-block;">Applications</h2>
+        <div class="portfolio-grid">
+            
+            <div class="card-wrap">
+                <div class="card">
+                    <div class="card-content">
+                        <div class="app-icon">
+                            <img src="ZikirNur.jpg" alt="Logo ZikirNur">
+                        </div>
+                        <h3 style="color:var(--lime); margin-bottom:10px;">ZikirNur</h3>
+                        <p style="font-size:0.9rem; color:#ccc; margin-bottom:20px;">Aplikasi islami lengkap dengan notifikasi Adzan, Dzikir Harian, Tasbih Digital, Arah Kiblat, & Al-Qur'an Offline.</p>
+                    </div>
+                    <div style="width:100%">
+                        <a href="#" class="btn-dl playstore"><i class="fab fa-google-play"></i> PlayStore (Akan Hadir)</a>
+                        <a href="https://www.mediafire.com/file/3mfxhg5j6w0a8b7/ZikurNur-app-release.apk/file" class="btn-dl mediafire"><i class="fas fa-fire"></i> Download (Free)</a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card-wrap">
+                <div class="card">
+                    <div class="card-content">
+                        <div class="app-icon">
+                            <img src="Kalkulator.png" alt="Logo Kalkulator">
+                        </div>
+                        <h3 style="color:var(--lime); margin-bottom:10px;">Kalkulator</h3>
+                        <p style="font-size:0.9rem; color:#ccc; margin-bottom:20px;">
+                            Aplikasi kalkulator pintar dengan antarmuka modern. Mendukung perhitungan aritmatika dasar, mode Ilmiah, dan Pengonversi satuan.
+                        </p>
+                    </div>
+                    <div style="width:100%">
+                        <a href="#" class="btn-dl playstore"><i class="fab fa-google-play"></i> PlayStore (Akan Hadir)</a>
+                        <a href="https://www.mediafire.com/file/84gzenmyza0w4d3/Kalkulator.apk/file" class="btn-dl mediafire"><i class="fas fa-fire"></i> Download (Free)</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card-wrap">
+                <div class="card">
+                    <div class="card-content">
+                        <div class="app-icon">
+                            <img src="SmartDKM.png" alt="Smart DKM LOGO">
+                        </div>
+                        <h3 style="color:var(--lime); margin-bottom:10px;">Smart DKM</h3>
+                        <p style="font-size:0.9rem; color:#ccc; margin-bottom:20px;">
+                            Smart DKM adalah aplikasi berbasis web (Web App) yang dirancang sebagai papan informasi digital (Digital Signage) dan manajemen administrasi untuk masjid. Aplikasi ini bersifat Hybrid (Online & Offline), artinya data disimpan secara lokal di perangkat (HP/Tablet/Smart TV) namun memiliki fitur Cloud Sync (menggunakan Firebase) agar admin dapat mengupdate data dari jarak jauh dan data tersebut otomatis berubah di layar masjid atau HP jamaah.</p>
+                    </div>
+                    <div style="width:100%">
+                        <a href="#" class="btn-dl playstore"><i class="fab fa-google-play"></i> PlayStore (Akan Hadir)</a>
+                        <a href="https://www.mediafire.com/file/lq9jc3feplrfqvl/Smart_DKM.apk/file" class="btn-dl mediafire"><i class="fas fa-fire"></i> Download (Free)</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card-wrap">
+                <div class="card">
+                    <span class="premium-tag">BERBAYAR</span>
+                    <div class="card-content">
+                        <div class="app-icon">
+                            <img src="WifiMonitorPro.jpg" alt="Logo WifiMonitorProID">
+                        </div>
+                        
+                        <h3 style="color:var(--gold); margin-bottom:10px;">Wifi Monitor Pro ID</h3>
+                        <p style="font-size:0.9rem; color:#ccc; margin-bottom:20px;">
+                            Pantau dan amankan jaringan WiFi Anda secara real-time. Fitur Premium meliputi: Deteksi Pencuri WiFi, Analisis Sinyal Detail, dan Pengalaman Bebas Iklan.
+                        </p>
+                    </div>
+                    
+                    <div style="width:100%">
+                        <div id="buy-section">
+                            <a href="https://wa.me/6281275623551?text=Halo%20AppWebiatech,%20saya%20mau%20beli%20aplikasi%20Wifi%20Monitor%20Pro." target="_blank" class="btn-dl premium-btn">
+                                <i class="fas fa-shopping-cart"></i> Beli (Rp 500.000)
+                            </a>
+                            <div class="promo-area">
+                                <div style="font-size:0.7rem; color:#aaa; margin-bottom:5px;">Punya Kode Voucher/Install Gratis?</div>
+                                <div class="promo-flex">
+                                    <input type="text" id="promoInput" class="promo-input" placeholder="KODE PROMO">
+                                    <button onclick="checkPromo()" class="promo-btn">Cek</button>
+                                </div>
+                                <div id="errorMsg" class="error-msg"></div>
+                            </div>
+                        </div>
+
+                        <div id="download-section" class="hidden">
+                            <div style="background: rgba(164, 214, 57, 0.2); color: var(--lime); padding: 10px; border-radius: 8px; font-size: 0.8rem; margin-bottom: 10px; border: 1px solid var(--lime);">
+                                <i class="fas fa-check-circle"></i> Kode Berhasil!
+                            </div>
+                            <a href="https://www.mediafire.com/" class="btn-dl mediafire">
+                                <i class="fas fa-download"></i> Download Gratis
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <section id="upcoming">
+        <h2 style="font-size:1.8rem; margin-bottom:40px; color:white; border-bottom:2px solid var(--lime); display:inline-block;">Coming Soon</h2>
+        
+        <div class="roadmap-grid">
+            
+            <div class="roadmap-card">
+                <span class="roadmap-badge">Game Development</span>
+                <div style="display:flex; align-items:center; gap:15px; margin-bottom:15px;">
+                    <i class="fas fa-gamepad" style="font-size:2rem; color:var(--cyan);"></i>
+                    <div>
+                        <h3 style="color:white; font-size:1.2rem;">Petualangan Santri</h3>
+                        <p style="font-size:0.8rem; color:#888;">Game Edukasi RPG</p>
+                    </div>
+                </div>
+                <p style="font-size:0.9rem; color:#ccc; margin-bottom:10px;">
+                    Game petualangan seru sambil belajar tajwid dan sejarah islam. Grafik 8-bit retro.
+                </p>
+                <div style="display:flex; justify-content:space-between; font-size:0.8rem; margin-bottom:5px;">
+                    <span style="color:var(--lime);">Progress</span>
+                    <span style="color:white;">80%</span>
+                </div>
+                <div class="progress-container">
+                    <div class="progress-bar" style="--target: 80%;"></div>
+                </div>
+            </div>
+
+            <div class="roadmap-card">
+                <span class="roadmap-badge">Productivity Tool</span>
+                <div style="display:flex; align-items:center; gap:15px; margin-bottom:15px;">
+                    <i class="fas fa-cash-register" style="font-size:2rem; color:var(--orange);"></i>
+                    <div>
+                        <h3 style="color:white; font-size:1.2rem;">KasirPro (UMKM Pintar)</h3>
+                        <p style="font-size:0.8rem; color:#888;">Aplikasi Manajemen Toko</p>
+                    </div>
+                </div>
+                <p style="font-size:0.9rem; color:#ccc; margin-bottom:10px;">
+                    Kelola stok, laporan keuangan, dan cetak struk bluetooth. Cocok untuk warung & cafe.
+                </p>
+                <div style="display:flex; justify-content:space-between; font-size:0.8rem; margin-bottom:5px;">
+                    <span style="color:var(--orange);">Progress</span>
+                    <span style="color:white;">100%</span>
+                </div>
+                <div class="progress-container">
+                    <div class="progress-bar" style="--target: 100%; background: var(--orange); box-shadow: 0 0 10px var(--orange);"></div>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <section id="kontak">
+        <div class="contact-wrapper">
+            <div class="glass-panel">
+                <h3 style="color:var(--lime); margin-bottom:20px;">Hubungi Kami</h3>
+                <div style="display:flex; align-items:center; margin-bottom:20px; gap:15px;">
+                    <i class="fab fa-whatsapp" style="font-size:1.8rem; color:#25D366;"></i>
+                    <div>
+                        <div style="font-size:0.8rem; color:#888;">WhatsApp</div>
+                        <div style="font-size:1rem;">+62 812-7562-3551</div>
+                    </div>
+                </div>
+                <div style="display:flex; align-items:center; margin-bottom:20px; gap:15px;">
+                    <i class="far fa-envelope" style="font-size:1.8rem; color:var(--orange);"></i>
+                    <div>
+                        <div style="font-size:0.8rem; color:#888;">Email</div>
+                        <div style="font-size:1rem;">appwebiatech@gmail.com</div>
+                    </div>
+                </div>
+            </div>
+            <div class="glass-panel" id="saran">
+                <h3 style="color:var(--lime); margin-bottom:20px;">Saran</h3>
+                <form>
+                    <div class="input-group" style="margin-bottom:15px;">
+                        <input type="text" placeholder="Nama Anda">
+                    </div>
+                    <div class="input-group" style="margin-bottom:15px;">
+                        <textarea rows="3" placeholder="Pesan..."></textarea>
+                    </div>
+                    <button class="btn-action" style="width:100%; border:none; cursor:pointer;">Kirim</button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <footer>&copy; 2025 AppWebiatech - All Right Reserved.</footer>
+
+    <script>
+        // --- 1. CLOCK FUNCTION ---
+        function updateClock() {
+            const now = new Date();
+            const t = now.toLocaleTimeString('id-ID', { hour:'2-digit', minute:'2-digit', second:'2-digit', hour12:false }).replace(/\./g, ':');
+            const d = now.toLocaleDateString('id-ID', { weekday:'long', day:'numeric', month:'short' });
+            document.querySelectorAll('.time-target').forEach(e => e.innerText = t);
+            document.querySelectorAll('.date-target').forEach(e => e.innerText = d);
+        }
+        setInterval(updateClock, 1000); updateClock();
+
+        // --- 2. MENU FUNCTION ---
+        function toggleMenu() {
+            const o = document.getElementById('navOverlay');
+            const i = document.getElementById('burgerIcon');
+            o.classList.toggle('active');
+            i.classList.toggle('fa-times'); i.classList.toggle('fa-bars');
+        }
+
+        // --- 3. 3D EFFECT ---
+        if (window.innerWidth > 1024) {
+            document.querySelectorAll('.card-wrap').forEach(w => {
+                const c = w.querySelector('.card');
+                w.addEventListener('mousemove', (e) => {
+                    const r = w.getBoundingClientRect();
+                    const x = ((e.clientX - r.left) / r.width - 0.5) * 20;
+                    const y = ((e.clientY - r.top) / r.height - 0.5) * -20;
+                    c.style.transform = `rotateX(${y}deg) rotateY(${x}deg)`;
+                });
+                w.addEventListener('mouseleave', () => {
+                    c.style.transform = 'rotateX(0) rotateY(0)';
+                });
+            });
+        }
+
+        // --- 4. LOGIKA KODE PROMO ---
+        function checkPromo() {
+            // Ubah kode rahasia di sini
+            const KODE_RAHASIA = "APPGRATIS211@#$&&9381282838838882837788818288838821983838388383828282828282883828282828282883379293838288299999999993838388282818199293938938392929298373838288181818677777777888483883828818181818188181828828373838383883838383848484874737372882828282882828282828288282828377447747484838282828929292982838383828828282818818182"; 
+            
+            const inputField = document.getElementById('promoInput');
+            const errorMsg = document.getElementById('errorMsg');
+            const inputUser = inputField.value;
+            
+            // Menggunakan .toUpperCase() agar user bisa input huruf kecil/besar bebas
+            if(inputUser.toUpperCase() === KODE_RAHASIA) {
+                // KODE BENAR
+                document.getElementById('buy-section').classList.add('hidden'); 
+                document.getElementById('download-section').classList.remove('hidden'); 
+                errorMsg.style.display = "none"; 
+            } else {
+                // KODE SALAH
+                errorMsg.innerHTML = '<i class="fas fa-exclamation-circle"></i> Kode Salah! Silakan coba lagi.';
+                errorMsg.style.display = "block";
+                
+                inputField.value = ""; 
+                inputField.style.borderColor = "var(--red-error)";
+                inputField.style.background = "rgba(255, 77, 77, 0.1)";
+                inputField.classList.add('shake');
+                
+                setTimeout(() => {
+                    inputField.style.borderColor = "rgba(255,255,255,0.2)";
+                    inputField.style.background = "rgba(0,0,0,0.3)";
+                    inputField.classList.remove('shake');
+                }, 3000);
+            }
+        }
+
+        // --- 5. SECURITY (Anti Inspect) ---
+        document.addEventListener('contextmenu', event => event.preventDefault());
+        document.onkeydown = function(e) {
+            if(event.keyCode == 123) return false;
+            if(e.ctrlKey && e.shiftKey && e.keyCode == 'I'.charCodeAt(0)) return false;
+            if(e.ctrlKey && e.shiftKey && e.keyCode == 'C'.charCodeAt(0)) return false;
+            if(e.ctrlKey && e.keyCode == 'U'.charCodeAt(0)) return false;
+        }
+    </script>
+</body>
+</html>
+
+
+
+
