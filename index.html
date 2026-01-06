@@ -649,34 +649,48 @@
                     return;
                 }
 
-                snapshot.forEach(doc => {
-                    const data = doc.data(); const id = doc.id;
-                    window.allOrders.push({id, ...data});
-                    total++;
-                    if(data.status==="Menunggu Konfirmasi") pending++;
-                    if(data.status==="Diterima") success++;
-                    
-                    let badge = data.status==="Diterima"?"badge-success":(data.status==="Ditolak"?"badge-danger":"badge-pending");
-                    let wa = data.whatsapp ? data.whatsapp.toString().replace(/[^0-9]/g, "") : "";
-                    if(wa.startsWith("0")) wa = "62"+wa.slice(1);
+// ... (kode sebelumnya di atas tetap sama)
 
-                    html += `<tr>
-                        <td>${data.tanggal_rencana}</td>
-                        <td><b>${data.nama_pemesan}</b><br><small style="opacity:0.7;">${data.whatsapp}</small></td>
-                        <td>${data.produk}</td>
-                        <td><span class="badge ${badge}">${data.status}</span></td>
-                        <td>
-                            <button class="action-btn btn-wa" onclick="window.open('https://wa.me/${wa}','_blank')"><i class="fab fa-whatsapp"></i></button>
-                            <button class="action-btn btn-edit" onclick="openEditModal('${id}','${data.nama_pemesan}','${data.status}')"><i class="fas fa-pen"></i></button>
-                            <button class="action-btn btn-del" onclick="deleteBooking('${id}')"><i class="fas fa-trash"></i></button>
-                        </td>
-                    </tr>`;
+        snapshot.forEach(doc => {
+            const data = doc.data(); const id = doc.id;
+            window.allOrders.push({id, ...data});
+            total++;
+            if(data.status==="Menunggu Konfirmasi") pending++;
+            if(data.status==="Diterima") success++;
+            
+            let badge = data.status==="Diterima"?"badge-success":(data.status==="Ditolak"?"badge-danger":"badge-pending");
+            
+            // --- LOGIKA WA DIPERBARUI DI SINI ---
+            let wa = data.whatsapp ? data.whatsapp.toString().replace(/[^0-9]/g, "") : "";
+            if(wa.startsWith("0")) wa = "62"+wa.slice(1);
 
-                    if(count < 5) {
-                        dashHtml += `<tr><td>${data.nama_pemesan}</td><td>${data.produk}</td><td><span class="badge ${badge}">${data.status}</span></td></tr>`;
-                        count++;
-                    }
-                });
+            // 1. Buat kalimat pesannya
+            let kalimatPesan = `Halo Kak *${data.nama_pemesan}*, kami dari Daulay_TravelMedan.\n\nMengenai Booking Online: *${data.produk}*\nTanggal: ${data.tanggal_rencana}\nStatus saat ini: *${data.status}*.\n\nTerima kasih.`;
+            
+            // 2. Encode pesan agar bisa jadi link (mengubah spasi jadi %20 dst)
+            let linkWA = `https://wa.me/${wa}?text=${encodeURIComponent(kalimatPesan)}`;
+            // ------------------------------------
+
+            // Perhatikan bagian tombol WA di bawah (onclick menggunakan variable linkWA)
+            html += `<tr>
+                <td>${data.tanggal_rencana}</td>
+                <td><b>${data.nama_pemesan}</b><br><small style="opacity:0.7;">${data.whatsapp}</small></td>
+                <td>${data.produk}</td>
+                <td><span class="badge ${badge}">${data.status}</span></td>
+                <td>
+                    <button class="action-btn btn-wa" onclick="window.open('${linkWA}','_blank')"><i class="fab fa-whatsapp"></i></button>
+                    <button class="action-btn btn-edit" onclick="openEditModal('${id}','${data.nama_pemesan}','${data.status}')"><i class="fas fa-pen"></i></button>
+                    <button class="action-btn btn-del" onclick="deleteBooking('${id}')"><i class="fas fa-trash"></i></button>
+                </td>
+            </tr>`;
+
+            if(count < 5) {
+                dashHtml += `<tr><td>${data.nama_pemesan}</td><td>${data.produk}</td><td><span class="badge ${badge}">${data.status}</span></td></tr>`;
+                count++;
+            }
+        });
+
+        // ... (kode di bawah tetap sama)
 
                 tableBody.innerHTML = html; dashTableBody.innerHTML = dashHtml;
                 document.getElementById("totalOrder").innerText = total;
@@ -856,4 +870,4 @@
         }
     </script>
 </body>
-</html>
+                </html>
